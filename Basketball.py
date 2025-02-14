@@ -27,13 +27,16 @@ playerstats=load_data(selected_year)
 
 
 #sorted_unique_team=sorted(playerstats.Tm.unique())
-sorted_unique_team = sorted(playerstats['Team'].unique())
+sorted_unique_team = sorted(playerstats['Team'].astype(str).unique())
+
 selected_team=st.sidebar.multiselect('Team', sorted_unique_team, sorted_unique_team)
 
 unique_pos=['C','PF','SF','PG','SG']
 selected_pos=st.sidebar.multiselect('Position',unique_pos, unique_pos)
 
-df_selected_team=playerstats[(playerstats.Tm.isin(selected_team)&(playerstats.Pos.isin(selected_pos)))]
+#df_selected_team=playerstats[(playerstats.Tm.isin(selected_team)&(playerstats.Pos.isin(selected_pos)))]
+df_selected_team = playerstats[(playerstats['Team'].isin(selected_team)) & (playerstats['Pos'].isin(selected_pos))]
+
 
 st.header('Display player stats of selected Team')
 st.write("Data dimension:"+str(df_selected_team.shape[0])+"rows and"+str(df_selected_team.shape[1])+"columns")
@@ -48,7 +51,7 @@ def filedownload(df):
 st.markdown(filedownload(df_selected_team), unsafe_allow_html=True)
 if st.button('Intercorraltion Heatmap'):
     st.header('Intercorrational Matrix Heatmap')
-    df_selected_team=df_selected_team.drop(['Player','Pos','Tm'],axis=1)
+    df_selected_team=df_selected_team.drop(['Player','Pos','Team', 'Awards'],axis=1)
     corr=df_selected_team.corr()
     mask=np.zeros_like(corr)
     mask[np.triu_indices_from(mask)]=True
